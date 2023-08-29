@@ -7,14 +7,15 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  req.body.owner = req.user._id;
+  const { _id } = req.user;
+  req.body.owner = _id;
   Cards.create({ ...req.body })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       console.log(err);
       if (err.name === 'ValidationError') {
         return res.status(400).send(
-          { message: `${Object.values(err.errors).map((err) => err.message).join(', ')}` },
+          { message: `${Object.values(err.errors).map(() => err.message).join(', ')}` },
         );
       }
       return res.status(500).send('Server Error');
