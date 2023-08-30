@@ -3,7 +3,7 @@ const Users = require('../models/user');
 const getUsers = (req, res) => {
   Users.find()
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send('Server Error'));
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 const getUserById = (req, res) => {
@@ -15,20 +15,19 @@ const getUserById = (req, res) => {
       }
       return res.status(200).send(user);
     })
-    .catch(() => res.status(500).send('Server Error'));
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 const createUser = (req, res) => {
   Users.create({ ...req.body })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
-        return res.status(400).send(
+        res.status(400).send(
           { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
         );
       }
-      return res.status(500).send('Server Error');
+      res.status(500).send({ message: 'Server Error' });
     });
 };
 
@@ -38,13 +37,12 @@ const updateUser = (req, res) => {
   return Users.findByIdAndUpdate(_id, { name, about }, { new: true })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
         return res.status(400).send(
           { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
         );
       }
-      return res.status(500).send('Server Error');
+      return res.status(500).send({ message: 'Server Error' });
     });
 };
 
@@ -54,13 +52,12 @@ const updateAvatar = (req, res) => {
   return Users.findByIdAndUpdate(_id, { avatar }, { new: true })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
         return res.status(400).send(
           { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
         );
       }
-      return res.status(500).send('Server Error');
+      return res.status(500).send({ message: 'Server Error' });
     });
 };
 

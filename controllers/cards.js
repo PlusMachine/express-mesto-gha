@@ -3,7 +3,7 @@ const Cards = require('../models/card');
 const getCards = (req, res) => {
   Cards.find()
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send('Server Error'));
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 const createCard = (req, res) => {
@@ -12,13 +12,12 @@ const createCard = (req, res) => {
   Cards.create({ ...req.body })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
         return res.status(400).send(
           { message: `${Object.values(err.errors).map(() => err.message).join(', ')}` },
         );
       }
-      return res.status(500).send('Server Error');
+      return res.status(500).send({ message: 'Server Error' });
     });
 };
 
@@ -31,7 +30,7 @@ const deleteCard = (req, res) => {
       }
       return res.status(200).send(card);
     })
-    .catch(() => res.status(500).send('Server Error'));
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 const likeCard = (req, res) => {
@@ -41,7 +40,8 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: _id } },
     { new: true },
   )
-    .catch(() => res.status(500).send('Server Error'));
+    .then((card) => res.status(201).send(card))
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 const dislikeCard = (req, res) => {
@@ -51,7 +51,8 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: _id } },
     { new: true },
   )
-    .catch(() => res.status(500).send('Server Error'));
+    .then((card) => res.status(201).send(card))
+    .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
 
 module.exports = {
