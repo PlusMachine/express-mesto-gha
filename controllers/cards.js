@@ -34,8 +34,30 @@ const deleteCard = (req, res) => {
     .catch(() => res.status(500).send('Server Error'));
 };
 
+const likeCard = (req, res) => {
+  const { _id } = req.user;
+  return Cards.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: _id } },
+    { new: true },
+  )
+    .catch(() => res.status(500).send('Server Error'));
+};
+
+const dislikeCard = (req, res) => {
+  const { _id } = req.user;
+  return Cards.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: _id } },
+    { new: true },
+  )
+    .catch(() => res.status(500).send('Server Error'));
+};
+
 module.exports = {
   getCards,
   createCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };

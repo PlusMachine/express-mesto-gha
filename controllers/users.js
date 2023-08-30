@@ -32,8 +32,42 @@ const createUser = (req, res) => {
     });
 };
 
+const updateUser = (req, res) => {
+  const { _id } = req.user;
+  const { name, about } = req.body;
+  return Users.findByIdAndUpdate(_id, { name, about }, { new: true })
+    .then((user) => res.status(201).send(user))
+    .catch((err) => {
+      console.log(err);
+      if (err.name === 'ValidationError') {
+        return res.status(400).send(
+          { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
+        );
+      }
+      return res.status(500).send('Server Error');
+    });
+};
+
+const updateAvatar = (req, res) => {
+  const { _id } = req.user;
+  const { avatar } = req.body;
+  return Users.findByIdAndUpdate(_id, { avatar }, { new: true })
+    .then((user) => res.status(201).send(user))
+    .catch((err) => {
+      console.log(err);
+      if (err.name === 'ValidationError') {
+        return res.status(400).send(
+          { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
+        );
+      }
+      return res.status(500).send('Server Error');
+    });
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
+  updateUser,
+  updateAvatar,
 };
