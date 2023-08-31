@@ -23,14 +23,18 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  return Cards.findByIdAndDelete(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Card not found' });
-      }
-      return res.status(200).send(card);
-    })
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+  if (req.params.cardId.length === 24) {
+    Cards.findByIdAndDelete(cardId)
+      .then((card) => {
+        if (!card) {
+          return res.status(404).send({ message: 'Card not found' });
+        }
+        return res.status(200).send(card);
+      })
+      .catch(() => res.status(500).send({ message: 'Server Error' }));
+  } else {
+    res.status(400).send({ message: 'Incorrect id card' });
+  }
 };
 
 const likeCard = (req, res) => {
