@@ -35,7 +35,7 @@ const deleteCard = (req, res) => {
 
 const likeCard = (req, res) => {
   const { _id } = req.user;
-  if (req.params.cardId === 24) {
+  if (req.params.cardId.length === 24) {
     return Cards.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: _id } },
