@@ -11,9 +11,9 @@ const getUserById = (req, res) => {
   return Users.findById(id)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'User not found' });
+        return res.status(404).send({ message: 'User not found' });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch(() => res.status(500).send({ message: 'Server Error' }));
 };
