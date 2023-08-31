@@ -41,7 +41,10 @@ const likeCard = (req, res) => {
       { $addToSet: { likes: _id } },
       { new: true },
     )
-      .then((card) => res.status(201).send(card))
+      .then((card) => {
+        if (!card) { return res.status(404).send({ message: 'Wrong _id' }); }
+        return res.status(201).send(card);
+      })
       .catch(() => res.status(500).send({ message: 'Server Error' }));
   }
   return res.status(400).send({ message: 'Incorrect id card' });
