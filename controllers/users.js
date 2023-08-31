@@ -8,14 +8,18 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   const { id } = req.params;
-  return Users.findById(id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
-      return res.status(200).send(user);
-    })
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+  if (id.length === 24) {
+    Users.findById(id)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).send({ message: 'User not found' });
+        }
+        return res.status(200).send(user);
+      })
+      .catch(() => res.status(500).send({ message: 'Server Error' }));
+  } else {
+    res.status(400).send({ message: 'Incorrect id' });
+  }
 };
 
 const createUser = (req, res) => {
