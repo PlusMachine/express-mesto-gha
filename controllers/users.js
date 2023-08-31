@@ -24,7 +24,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send(
-          { message: 'Server Error' },
+          { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       } else {
         res.status(500).send({ message: 'Server Error' });
@@ -40,7 +40,7 @@ const updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send(
-          { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
+          { message: `${Object.values(err.errors).map((err) => err.message).join(', ')}` },
         );
       }
       return res.status(500).send({ message: 'Server Error' });
