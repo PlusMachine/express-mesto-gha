@@ -24,10 +24,11 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send(
-          { message: `${Object.values(err.errors.map(() => err.message).join(', '))}` },
+          { message: { message: 'Server Error' } },
         );
+      } else {
+        res.status(500).send({ message: 'Server Error' });
       }
-      res.status(500).send({ message: 'Server Error' });
     });
 };
 
