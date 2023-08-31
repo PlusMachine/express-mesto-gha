@@ -52,13 +52,19 @@ const likeCard = (req, res) => {
 
 const dislikeCard = (req, res) => {
   const { _id } = req.user;
-  return Cards.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: _id } },
-    { new: true },
-  )
-    .then((card) => res.status(201).send(card))
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+  if (req.params.cardId.length === 24) {
+    return Cards.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: _id } },
+      { new: true },
+    )
+      .then((card) => {
+        if (!card) { return res.status(404).send({ message: 'Wrong _id' }); }
+        return res.status(201).send(card);
+      })
+      .catch(() => res.status(500).send({ message: 'Server Error' }));
+  }
+  return res.status(400).send({ message: 'Incorrect id card' });
 };
 
 module.exports = {
