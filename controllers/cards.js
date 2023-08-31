@@ -36,7 +36,7 @@ const deleteCard = (req, res) => {
 const likeCard = (req, res) => {
   const { _id } = req.user;
   if (req.params.cardId.length === 24) {
-    return Cards.findByIdAndUpdate(
+    Cards.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: _id } },
       { new: true },
@@ -46,25 +46,27 @@ const likeCard = (req, res) => {
         return res.status(201).send(card);
       })
       .catch(() => res.status(500).send({ message: 'Server Error' }));
+  } else {
+    res.status(400).send({ message: 'Incorrect id card' });
   }
-  return res.status(400).send({ message: 'Incorrect id card' });
 };
 
 const dislikeCard = (req, res) => {
   const { _id } = req.user;
   if (req.params.cardId.length === 24) {
-    return Cards.findByIdAndUpdate(
+    Cards.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: _id } },
       { new: true },
     )
       .then((card) => {
         if (!card) { return res.status(404).send({ message: 'Wrong _id' }); }
-        return res.status(201).send(card);
+        return res.status(200).send(card);
       })
       .catch(() => res.status(500).send({ message: 'Server Error' }));
+  } else {
+    res.status(400).send({ message: 'Incorrect id card' });
   }
-  return res.status(400).send({ message: 'Incorrect id card' });
 };
 
 module.exports = {
