@@ -35,13 +35,16 @@ const deleteCard = (req, res) => {
 
 const likeCard = (req, res) => {
   const { _id } = req.user;
-  return Cards.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: _id } },
-    { new: true },
-  )
-    .then((card) => res.status(201).send(card))
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+  if (req.params.cardId === 24) {
+    return Cards.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: _id } },
+      { new: true },
+    )
+      .then((card) => res.status(201).send(card))
+      .catch(() => res.status(500).send({ message: 'Server Error' }));
+  }
+  return res.status(400).send({ message: 'Incorrect id card' });
 };
 
 const dislikeCard = (req, res) => {

@@ -42,7 +42,6 @@ const updateUser = (req, res) => {
   return Users.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
         return res.status(400).send(
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
@@ -55,8 +54,8 @@ const updateUser = (req, res) => {
 const updateAvatar = (req, res) => {
   const { _id } = req.user;
   const { avatar } = req.body;
-  return Users.findByIdAndUpdate(_id, { avatar }, { new: true })
-    .then((user) => res.status(201).send(user))
+  return Users.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send(
