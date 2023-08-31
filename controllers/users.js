@@ -40,7 +40,7 @@ const updateUser = (req, res) => {
   const { _id } = req.user;
   const { name, about } = req.body;
   return Users.findByIdAndUpdate(_id, { name, about }, { new: true })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send(
