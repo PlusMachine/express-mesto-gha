@@ -39,7 +39,7 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   const { _id } = req.user;
   const { name, about } = req.body;
-  return Users.findByIdAndUpdate(_id, { name, about }, { new: true, runValidations: true })
+  return Users.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       console.log(err);
