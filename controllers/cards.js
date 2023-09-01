@@ -56,7 +56,12 @@ const likeCard = (req, res) => {
       if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
       return res.status(HTTP_STATUS_CREATED).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
+    .catch((error) => {
+      if (error instanceof mongoose.Error.CastError) {
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
+      }
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+    });
 };
 
 const dislikeCard = (req, res) => {
@@ -69,7 +74,12 @@ const dislikeCard = (req, res) => {
       if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
       return res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
+    .catch((error) => {
+      if (error instanceof mongoose.Error.CastError) {
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
+      }
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+    });
 };
 
 module.exports = {
