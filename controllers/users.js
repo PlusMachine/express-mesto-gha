@@ -10,7 +10,7 @@ const {
 const getUsers = (req, res) => {
   Users.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' }));
+    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
 };
 
 const getUserById = (req, res) => {
@@ -22,7 +22,7 @@ const getUserById = (req, res) => {
       }
       return res.status(HTTP_STATUS_OK).send(user);
     })
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' }));
+    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
 };
 
 const createUser = (req, res) => {
@@ -34,7 +34,7 @@ const createUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       } else {
-        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
       }
     });
 };
@@ -50,7 +50,7 @@ const updateUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
     });
 };
 
@@ -65,7 +65,7 @@ const updateAvatar = (req, res) => {
           { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
         );
       }
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
     });
 };
 
