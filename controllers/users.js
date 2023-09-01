@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Users = require('../models/user');
 
 const {
@@ -5,12 +6,13 @@ const {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_SERVER_ERROR,
 } = require('../errors/httpStatusCodes');
 
 const getUsers = (req, res) => {
   Users.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
 const getUserById = (req, res) => {
@@ -22,7 +24,12 @@ const getUserById = (req, res) => {
       }
       return res.status(HTTP_STATUS_OK).send(user);
     })
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch((error) => {
+      if (error instanceof mongoose.Error.CastError) {
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
+      }
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+    });
 };
 
 const createUser = (req, res) => {
@@ -34,15 +41,14 @@ const createUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       } else {
-        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
+        res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
       }
     });
 };
 
 const updateUser = (req, res) => {
-  const { _id } = req.user;
   const { name, about } = req.body;
-  return Users.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
+  return Users.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -50,7 +56,7 @@ const updateUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
 };
 
@@ -65,7 +71,7 @@ const updateAvatar = (req, res) => {
           { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
         );
       }
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
 };
 

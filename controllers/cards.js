@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Cards = require('../models/card');
 
 const {
@@ -5,6 +6,7 @@ const {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_SERVER_ERROR,
 } = require('../errors/httpStatusCodes');
 
 const getCards = (req, res) => {
@@ -14,8 +16,7 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const { _id } = req.user;
-  req.body.owner = _id;
+  req.body.owner = req.user._id;
   Cards.create({ ...req.body })
     .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
     .catch((err) => {
@@ -24,7 +25,7 @@ const createCard = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
 };
 
@@ -37,35 +38,33 @@ const deleteCard = (req, res) => {
       }
       return res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
 const likeCard = (req, res) => {
-  const { _id } = req.user;
   Cards.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: _id } },
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
       return res.status(HTTP_STATUS_CREATED).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
 const dislikeCard = (req, res) => {
-  const { _id } = req.user;
   Cards.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: _id } },
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
       return res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
 module.exports = {
