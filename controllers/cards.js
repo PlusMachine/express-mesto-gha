@@ -38,7 +38,12 @@ const deleteCard = (req, res) => {
       }
       return res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
+    .catch((error) => {
+      if (error instanceof mongoose.Error.CastError) {
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
+      }
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+    });
 };
 
 const likeCard = (req, res) => {
