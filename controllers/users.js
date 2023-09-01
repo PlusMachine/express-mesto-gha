@@ -5,13 +5,12 @@ const {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_SERVER_ERROR,
 } = require('../errors/httpStatusCodes');
 
 const getUsers = (req, res) => {
   Users.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
+    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' }));
 };
 
 const getUserById = (req, res) => {
@@ -23,7 +22,7 @@ const getUserById = (req, res) => {
       }
       return res.status(HTTP_STATUS_OK).send(user);
     })
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
+    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' }));
 };
 
 const createUser = (req, res) => {
@@ -35,7 +34,7 @@ const createUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       } else {
-        res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
       }
     });
 };
@@ -51,7 +50,7 @@ const updateUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
     });
 };
 
@@ -66,7 +65,7 @@ const updateAvatar = (req, res) => {
           { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
         );
       }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Server Error' });
     });
 };
 
