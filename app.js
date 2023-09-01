@@ -1,7 +1,11 @@
 const express = require('express');
+const mongoose = require('mongoose');
+
+const {
+  HTTP_STATUS_NOT_FOUND,
+} = require('./errors/httpStatusCodes');
 
 const app = express();
-const mongoose = require('mongoose');
 
 const router = require('./routes');
 
@@ -23,7 +27,7 @@ app.use(express.json());
 app.use(router);
 
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Page not found' });
+  res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Page not found' });
 });
 
 app.listen(PORT, () => {

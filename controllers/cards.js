@@ -1,23 +1,31 @@
 const Cards = require('../models/card');
 
+const {
+  HTTP_STATUS_OK,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_SERVER_ERROR,
+} = require('../errors/httpStatusCodes');
+
 const getCards = (req, res) => {
   Cards.find()
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+    .then((users) => res.status(HTTP_STATUS_OK).send(users))
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 const createCard = (req, res) => {
   const { _id } = req.user;
   req.body.owner = _id;
   Cards.create({ ...req.body })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send(
+        return res.status(HTTP_STATUS_BAD_REQUEST).send(
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(500).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
     });
 };
 
@@ -27,13 +35,13 @@ const deleteCard = (req, res) => {
     Cards.findByIdAndDelete(cardId)
       .then((card) => {
         if (!card) {
-          return res.status(404).send({ message: 'Card not found' });
+          return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Card not found' });
         }
-        return res.status(200).send(card);
+        return res.status(HTTP_STATUS_OK).send(card);
       })
-      .catch(() => res.status(500).send({ message: 'Server Error' }));
+      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
   } else {
-    res.status(400).send({ message: 'Incorrect id card' });
+    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
   }
 };
 
@@ -46,12 +54,12 @@ const likeCard = (req, res) => {
       { new: true },
     )
       .then((card) => {
-        if (!card) { return res.status(404).send({ message: 'Wrong _id' }); }
-        return res.status(201).send(card);
+        if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
+        return res.status(HTTP_STATUS_CREATED).send(card);
       })
-      .catch(() => res.status(500).send({ message: 'Server Error' }));
+      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
   } else {
-    res.status(400).send({ message: 'Incorrect id card' });
+    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
   }
 };
 
@@ -64,12 +72,12 @@ const dislikeCard = (req, res) => {
       { new: true },
     )
       .then((card) => {
-        if (!card) { return res.status(404).send({ message: 'Wrong _id' }); }
-        return res.status(200).send(card);
+        if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
+        return res.status(HTTP_STATUS_OK).send(card);
       })
-      .catch(() => res.status(500).send({ message: 'Server Error' }));
+      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
   } else {
-    res.status(400).send({ message: 'Incorrect id card' });
+    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
   }
 };
 

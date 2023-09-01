@@ -1,9 +1,17 @@
 const Users = require('../models/user');
 
+const {
+  HTTP_STATUS_OK,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_SERVER_ERROR,
+} = require('../errors/httpStatusCodes');
+
 const getUsers = (req, res) => {
   Users.find()
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Server Error' }));
+    .then((users) => res.status(HTTP_STATUS_OK).send(users))
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 const getUserById = (req, res) => {
@@ -12,26 +20,26 @@ const getUserById = (req, res) => {
     Users.findById(id)
       .then((user) => {
         if (!user) {
-          return res.status(404).send({ message: 'User not found' });
+          return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'User not found' });
         }
-        return res.status(200).send(user);
+        return res.status(HTTP_STATUS_OK).send(user);
       })
-      .catch(() => res.status(500).send({ message: 'Server Error' }));
+      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
   } else {
-    res.status(400).send({ message: 'Incorrect id' });
+    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id' });
   }
 };
 
 const createUser = (req, res) => {
   Users.create({ ...req.body })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(HTTP_STATUS_CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send(
+        res.status(HTTP_STATUS_BAD_REQUEST).send(
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       } else {
-        res.status(500).send({ message: 'Server Error' });
+        res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
       }
     });
 };
@@ -40,14 +48,14 @@ const updateUser = (req, res) => {
   const { _id } = req.user;
   const { name, about } = req.body;
   return Users.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send(
+        return res.status(HTTP_STATUS_BAD_REQUEST).send(
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      return res.status(500).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
     });
 };
 
@@ -55,14 +63,14 @@ const updateAvatar = (req, res) => {
   const { _id } = req.user;
   const { avatar } = req.body;
   return Users.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send(
+        return res.status(HTTP_STATUS_BAD_REQUEST).send(
           { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
         );
       }
-      return res.status(500).send({ message: 'Server Error' });
+      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' });
     });
 };
 
