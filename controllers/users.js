@@ -16,18 +16,14 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   const { id } = req.params;
-  if (id.length === 24) {
-    Users.findById(id)
-      .then((user) => {
-        if (!user) {
-          return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'User not found' });
-        }
-        return res.status(HTTP_STATUS_OK).send(user);
-      })
-      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
-  } else {
-    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id' });
-  }
+  Users.findById(id)
+    .then((user) => {
+      if (!user) {
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'User not found' });
+      }
+      return res.status(HTTP_STATUS_OK).send(user);
+    })
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 const createUser = (req, res) => {

@@ -31,54 +31,42 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  if (req.params.cardId.length === 24) {
-    Cards.findByIdAndDelete(cardId)
-      .then((card) => {
-        if (!card) {
-          return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Card not found' });
-        }
-        return res.status(HTTP_STATUS_OK).send(card);
-      })
-      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
-  } else {
-    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
-  }
+  Cards.findByIdAndDelete(cardId)
+    .then((card) => {
+      if (!card) {
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Card not found' });
+      }
+      return res.status(HTTP_STATUS_OK).send(card);
+    })
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 const likeCard = (req, res) => {
   const { _id } = req.user;
-  if (req.params.cardId.length === 24) {
-    Cards.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: _id } },
-      { new: true },
-    )
-      .then((card) => {
-        if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
-        return res.status(HTTP_STATUS_CREATED).send(card);
-      })
-      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
-  } else {
-    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
-  }
+  Cards.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: _id } },
+    { new: true },
+  )
+    .then((card) => {
+      if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
+      return res.status(HTTP_STATUS_CREATED).send(card);
+    })
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 const dislikeCard = (req, res) => {
   const { _id } = req.user;
-  if (req.params.cardId.length === 24) {
-    Cards.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: _id } },
-      { new: true },
-    )
-      .then((card) => {
-        if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
-        return res.status(HTTP_STATUS_OK).send(card);
-      })
-      .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
-  } else {
-    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' });
-  }
+  Cards.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: _id } },
+    { new: true },
+  )
+    .then((card) => {
+      if (!card) { return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Wrong _id' }); }
+      return res.status(HTTP_STATUS_OK).send(card);
+    })
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server Error' }));
 };
 
 module.exports = {
