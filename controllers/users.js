@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res, next) => {
-  Users.findById(req.params.userId)
+  Users.findById(req.params.id)
     .orFail()
     .then((user) => {
       res.status(HTTP_STATUS_OK).send(user);
