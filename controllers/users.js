@@ -23,9 +23,9 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Неверный id: ${req.params.userId}`));
+        next(new BadRequestError(`Wrong id: ${req.params.userId}`));
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+        next(new NotFoundError(`User ${req.params.userId} not found`));
       } else { next(err); }
     });
 };
@@ -49,7 +49,7 @@ const updateUser = (req, res, next) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+        next(new NotFoundError(`User ${req.params.userId} not found`));
       } else { next(err); }
     });
 };
@@ -63,7 +63,7 @@ const updateAvatar = (req, res, next) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+        next(new NotFoundError(`User ${req.params.userId} not found`));
       } else { next(err); }
     });
 };

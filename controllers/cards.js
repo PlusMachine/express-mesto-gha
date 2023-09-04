@@ -8,41 +8,42 @@ const {
 
 const mongoose = require('mongoose');
 const Cards = require('../models/card');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Cards.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   req.body.owner = req.user._id;
   Cards.create({ ...req.body })
+    .orFail()
     .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send(
-          { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
-        );
-      }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else { next(err); }
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Cards.findByIdAndDelete(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Card not found' });
-      }
-      return res.status(HTTP_STATUS_OK).send(card);
+    .orFail()
+    .then(() => {
+      res.status(HTTP_STATUS_OK).send({ message: 'Card was deleted' });
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.CastError) {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Card ${cardId} not found`));
+      } else if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError(`Wrong id: ${req.params.userId}`));
+      } else {
+        next();
       }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
 };
 
