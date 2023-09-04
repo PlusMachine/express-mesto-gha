@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-const Users = require('../models/user');
-
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_SERVER_ERROR,
-} = require('../errors/httpStatusCodes');
+} = require('http2').constants;
+
+const mongoose = require('mongoose');
+const Users = require('../models/user');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 
 const getUsers = (req, res) => {
   Users.find()
@@ -15,63 +15,56 @@ const getUsers = (req, res) => {
     .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
-const getUserById = (req, res) => {
-  const { id } = req.params;
-  Users.findById(id)
+const getUserById = (req, res, next) => {
+  Users.findById(req.params.userId)
+    .orFail()
     .then((user) => {
-      if (!user) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'User not found' });
-      }
-      return res.status(HTTP_STATUS_OK).send(user);
+      res.status(HTTP_STATUS_OK).send(user);
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.CastError) {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
-      }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError(`Неверный id: ${req.params.userId}`));
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+      } else { next(err); }
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   Users.create({ ...req.body })
     .then((user) => res.status(HTTP_STATUS_CREATED).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(HTTP_STATUS_BAD_REQUEST).send(
-          { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
-        );
-      } else {
-        res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
-      }
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else { next(err); }
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   return Users.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .orFail()
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send(
-          { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
-        );
-      }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+      } else { next(err); }
     });
 };
 
-const updateAvatar = (req, res) => {
-  const { _id } = req.user;
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  return Users.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
+  return Users.findByIdAndUpdate(req.params.userId, { avatar }, { new: true, runValidators: true })
+    .orFail
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send(
-          { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
-        );
-      }
-      return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Пользователь с id ${req.params.userId} не найден`));
+      } else { next(err); }
     });
 };
 

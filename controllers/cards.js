@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-const Cards = require('../models/card');
-
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_SERVER_ERROR,
-} = require('../errors/httpStatusCodes');
+} = require('http2').constants;
+
+const mongoose = require('mongoose');
+const Cards = require('../models/card');
 
 const getCards = (req, res) => {
   Cards.find()

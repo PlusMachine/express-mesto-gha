@@ -1,9 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const {
-  HTTP_STATUS_NOT_FOUND,
-} = require('./errors/httpStatusCodes');
+const { HTTP_STATUS_NOT_FOUND } = require('http2').constants;
 
 const app = express();
 
