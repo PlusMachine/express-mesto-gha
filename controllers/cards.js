@@ -12,7 +12,7 @@ const {
 const getCards = (req, res) => {
   Cards.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Incorrect id card' }));
+    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
 };
 
 const createCard = (req, res) => {

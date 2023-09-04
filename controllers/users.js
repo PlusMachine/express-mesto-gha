@@ -56,9 +56,6 @@ const updateUser = (req, res) => {
           { message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` },
         );
       }
-      if (err instanceof mongoose.Error.CastError) {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
-      }
       return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
 };
@@ -73,9 +70,6 @@ const updateAvatar = (req, res) => {
         return res.status(HTTP_STATUS_BAD_REQUEST).send(
           { message: `${Object.values(err.errors.map((error) => error.message).join(', '))}` },
         );
-      }
-      if (err instanceof mongoose.Error.CastError) {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Invalid ID' });
       }
       return res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' });
     });
