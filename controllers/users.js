@@ -57,7 +57,7 @@ const updateUser = (req, res, next) => {
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   Users.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .orFail
+    .orFail()
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
