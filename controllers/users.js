@@ -56,7 +56,7 @@ const updateUser = (req, res, next) => {
 
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  return Users.findByIdAndUpdate(req.params.userId, { avatar }, { new: true, runValidators: true })
+  return Users.findByIdAndUpdate(req.params.id, { avatar }, { new: true, runValidators: true })
     .orFail
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
     .catch((err) => {
