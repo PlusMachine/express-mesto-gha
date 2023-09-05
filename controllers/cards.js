@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Cards = require('../models/card');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const getCards = (req, res, next) => {
   Cards.find()
@@ -27,18 +28,31 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Cards.findByIdAndDelete(cardId)
-    .orFail()
-    .then(() => {
-      res.status(HTTP_STATUS_OK).send({ message: 'Card was deleted' });
+  Cards.findById(cardId)
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        throw new ForbiddenError('Разрешено удалять только свои карточки');
+      }
+      Cards.deleteOne(card)
+        .orFail()
+        .then(() => {
+          res.status(HTTP_STATUS_OK).send({ message: 'Card was deleted' });
+        })
+        .catch((err) => {
+          if (err instanceof mongoose.Error.DocumentNotFoundError) {
+            next(new NotFoundError(`Card ${cardId} not found`));
+          } else if (err instanceof mongoose.Error.CastError) {
+            next(new BadRequestError('Invalid card id'));
+          } else {
+            next();
+          }
+        });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      if (err.name === 'TypeError') {
         next(new NotFoundError(`Card ${cardId} not found`));
-      } else if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Invalid card id'));
       } else {
-        next();
+        next(err);
       }
     });
 };
