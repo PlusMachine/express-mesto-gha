@@ -5,9 +5,12 @@ const {
 } = require('http2').constants;
 
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+// const jwt = require('jsonwebtoken');
 const Users = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
 
 const getUsers = (req, res) => {
   Users.find()
@@ -31,10 +34,17 @@ const getUserById = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  Users.create({ ...req.body })
-    .then((user) => res.status(HTTP_STATUS_CREATED).send(user))
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => Users.create({ email: req.body.email, password: hash }))
+    .then((user) => res.status(HTTP_STATUS_CREATED)
+      .send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
+      console.log(err);
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с такими email уже зарегистрирован'));
+      } else if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else { next(err); }
     });
