@@ -18,11 +18,14 @@ const getCards = (req, res, next) => {
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
   return Cards.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
+    .then((card) => Cards.populate(card, { path: 'owner' }))
+    .then((populatedCard) => res.status(HTTP_STATUS_CREATED).send(populatedCard))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
-      } else { next(err); }
+      } else {
+        next(err);
+      }
     });
 };
 

@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
-const httpRegex = require('../utils/regex');
+const { httpRegex } = require('../utils/regex');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'The "name" field is required.'],
+    required: true,
     minlength: [2, 'The minimum length of the "name" field should be at least 2 characters.'],
     maxlength: [30, 'The maximum length of the "name" field should be no more than 30 characters.'],
   },
   link: {
     type: String,
-    required: [true, 'The "link" field is required.'],
+    required: true,
     validate: {
       validator(r) {
-        return httpRegex.test(r);
+        httpRegex.test(r);
       },
       message: 'Wrong URL',
     },
@@ -21,7 +21,7 @@ const cardSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: [true, 'The "owner" field is required.'],
+    required: [true],
   },
   likes: {
     type: [mongoose.Schema.Types.ObjectId],
