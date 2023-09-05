@@ -1,6 +1,7 @@
 const { HTTP_STATUS_INTERNAL_SERVER_ERROR } = require('http2').constants;
 
 const errorHandler = (err, req, res, next) => {
+  console.log(err);
   const { statusCode = HTTP_STATUS_INTERNAL_SERVER_ERROR, message } = err;
   res
     .status(statusCode)

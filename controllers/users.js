@@ -41,7 +41,6 @@ const createUser = (req, res, next) => {
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
       }))
     .catch((err) => {
-      console.log(err);
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с такими email уже зарегистрирован'));
       } else if (err instanceof mongoose.Error.ValidationError) {
