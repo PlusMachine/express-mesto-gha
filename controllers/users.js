@@ -94,8 +94,15 @@ const login = (req, res, next) => {
 
 const getUserDetails = (req, res, next) => {
   Users.findById(req.user._id)
-    .then((user) => res.status(HTTP_STATUS_OK).send(user))
-    .catch(next);
+    .orFail()
+    .then((currentUser) => res.status(HTTP_STATUS_OK).send(currentUser))
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Пользователь по данному _id: ${req.user._id} не найден.`));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
