@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Поле должно быть заполнено'],
+    required: [true, 'The field must be filled in'],
     unique: true,
     validate: {
       validator(email) {
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Поле должно быть заполнено'],
+    required: [true, 'The field must be filled in'],
     select: false,
   },
 }, { versionKey: false });

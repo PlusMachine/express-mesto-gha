@@ -35,7 +35,7 @@ const deleteCard = (req, res, next) => {
     .orFail()
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        throw new ForbiddenError('Разрешено удалять только свои карточки');
+        throw new ForbiddenError('Only your cards can be deleted');
       }
       Cards.deleteOne(card)
         .orFail()
@@ -44,17 +44,17 @@ const deleteCard = (req, res, next) => {
         })
         .catch((err) => {
           if (err instanceof mongoose.Error.DocumentNotFoundError) {
-            next(new NotFoundError(`Card ${cardId} not found`));
-          } else if (err instanceof mongoose.Error.CastError) {
-            next(new BadRequestError('Invalid card id'));
+            next(new NotFoundError(`Card with _id: ${cardId} was not found.`));
           } else {
-            next();
+            next(err);
           }
         });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new NotFoundError(`Card ${cardId} not found`));
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError(`Card with _id: ${cardId} was not found.`));
+      } else if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError(`Incorrect card _id: ${cardId}`));
       } else {
         next(err);
       }

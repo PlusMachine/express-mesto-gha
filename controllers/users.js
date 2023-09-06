@@ -47,7 +47,7 @@ const createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с такими email уже зарегистрирован'));
+        next(new ConflictError('A user with this email address has already been registered'));
       } else if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else { next(err); }
@@ -98,7 +98,7 @@ const getUserDetails = (req, res, next) => {
     .then((currentUser) => res.status(HTTP_STATUS_OK).send(currentUser))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError(`Пользователь по данному _id: ${req.user._id} не найден.`));
+        next(new NotFoundError(`No user by this _id: ${req.user._id} was found.`));
       } else {
         next(err);
       }
