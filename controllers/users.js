@@ -1,7 +1,6 @@
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_SERVER_ERROR,
 } = require('http2').constants;
 
 const mongoose = require('mongoose');
@@ -12,10 +11,10 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   Users.find()
     .then((users) => res.status(HTTP_STATUS_OK).send(users))
-    .catch(() => res.status(HTTP_STATUS_SERVER_ERROR).send({ message: 'Server error' }));
+    .catch(next);
 };
 
 const getUserById = (req, res, next) => {
